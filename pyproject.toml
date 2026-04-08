@@ -16,8 +16,12 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "gradio>=4.0.0",
     "numpy>=1.24.0",
-    "requests>=2.31.0"
+    "requests>=2.31.0",
+    "openenv-core>=0.2.0"
 ]
+
+[project.scripts]
+server = "server.app:start"
 
 [tool.setuptools.packages.find]
 include = ["server", "server.*"]
