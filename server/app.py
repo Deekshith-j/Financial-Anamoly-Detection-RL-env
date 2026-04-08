@@ -78,9 +78,12 @@ from app import demo
 
 app = gr.mount_gradio_app(app, demo, path="/")
 
-def start():
+def main():
     """CLI entrypoint to run the server."""
     import uvicorn
     import os
     os.environ["ENV_BASE_URL"] = "http://127.0.0.1:7860"
     uvicorn.run("server.app:app", host="0.0.0.0", port=7860)
+
+if __name__ == "__main__":
+    main()
