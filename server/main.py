@@ -71,3 +71,9 @@ def health():
 def tasks():
     """List all available task IDs."""
     return {"tasks": TASK_IDS}
+
+# Mount Gradio UI at root so both FastAPI and Gradio run on a single port for HF Spaces
+import gradio as gr
+from app import demo
+
+app = gr.mount_gradio_app(app, demo, path="/")
