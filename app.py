@@ -8,9 +8,6 @@ Imports all env/llm helpers from inference.py — no circular imports.
 
 import os
 import json
-from dotenv import load_dotenv
-
-load_dotenv()
 
 import requests
 import gradio as gr
@@ -214,12 +211,7 @@ body { background: #0f1117; }
 """
 
 with gr.Blocks(
-    title="Financial Anomaly Detection — OpenEnv",
-    theme=gr.themes.Base(
-        primary_hue="emerald",
-        neutral_hue="slate",
-    ),
-    css=CSS,
+    title="Financial Anomaly Detection — OpenEnv"
 ) as demo:
 
     gr.HTML("""
@@ -336,4 +328,12 @@ with gr.Blocks(
 
 
 if __name__ == "__main__":
-    demo.launch(server_name="0.0.0.0", server_port=7861, share=False)
+    demo.launch(
+        server_name="0.0.0.0", 
+        share=False,
+        theme=gr.themes.Base(
+            primary_hue="emerald",
+            neutral_hue="slate",
+        ),
+        css=CSS
+    )
