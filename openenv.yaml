@@ -1,0 +1,161 @@
+name: financial-anomaly-env
+version: "1.0.0"
+description: >
+  Real RL environment for financial fraud and anomaly detection.
+  Each episode generates fresh transactions procedurally using statistical
+  distributions. Ground truth is server-side only — the agent never sees labels.
+  Three tasks of increasing difficulty: duplicate detection, multi-pattern fraud,
+  and multi-hop money laundering chain detection.
+
+base_url: "http://localhost:7860"
+
+tasks:
+  - id: duplicate_detection
+    description: >
+      Identify duplicate or near-duplicate charges in a transaction batch.
+      Same account + same merchant + same amount (within $0.01) + within 24 hours.
+    difficulty: easy
+    max_steps: 3
+    score_range: [0.0, 1.0]
+
+  - id: pattern_fraud
+    description: >
+      Detect multiple simultaneous fraud patterns: velocity attacks, round-number
+      structuring, unusual merchant categories, and after-hours transactions.
+      Not all patterns are active in every episode.
+    difficulty: medium
+    max_steps: 3
+    score_range: [0.0, 1.0]
+
+  - id: laundering_chain
+    description: >
+      Identify a multi-hop money laundering chain (Placement → Layering → Integration).
+      Write a full SAR-style report naming all accounts, amounts, and the structuring
+      pattern. Minimum 150 words required in report_text.
+    difficulty: hard
+    max_steps: 3
+    score_range: [0.0, 1.0]
+
+endpoints:
+  reset:
+    method: POST
+    path: /reset
+    query_params:
+      - name: task_id
+        type: string
+        default: duplicate_detection
+        required: false
+      - name: seed
+        type: integer
+        required: false
+    response_model: ResetResult
+
+  step:
+    method: POST
+    path: /step
+    query_params:
+      - name: task_id
+        type: string
+        default: duplicate_detection
+        required: false
+    body_model: FinancialAction
+    response_model: StepResult
+
+  state:
+    method: GET
+    path: /state
+    query_params:
+      - name: task_id
+        type: string
+        default: duplicate_detection
+        required: false
+
+  health:
+    method: GET
+    path: /health
+
+action_schema:
+  type: object
+  properties:
+    flagged_ids:
+      type: array
+      items:
+        type: string
+      description: >
+        Transaction IDs the agent believes are anomalous.
+        Must be same length as anomaly_types.
+    anomaly_types:
+      type: array
+      items:
+        type: string
+        enum:
+          - duplicate
+          - velocity_attack
+          - round_number
+          - unusual_merchant
+          - after_hours
+          - structuring
+          - laundering
+      description: >
+        Anomaly type label for each flagged transaction (parallel to flagged_ids).
+    report_text:
+      type: string
+      description: >
+        Written incident report. For laundering_chain task, must be >= 150 words
+        and include a SAR-style narrative.
+    disposition:
+      type: string
+      enum: [block, review, approve]
+      default: review
+    confidence:
+      type: number
+      minimum: 0.0
+      maximum: 1.0
+      default: 0.5
+
+observation_schema:
+  type: object
+  properties:
+    transactions:
+      type: array
+      description: >
+        List of TransactionRecord objects (NO label field — agent cannot see ground truth).
+    account_profiles:
+      type: object
+      description: >
+        Dict of account_id -> AccountProfile. risk_score is excluded from agent view.
+    task_instruction:
+      type: string
+    step_number:
+      type: integer
+    feedback:
+      type: string
+      description: Score breakdown and hints from the previous step.
+    task_id:
+      type: string
+    episode_id:
+      type: string
+      description: Unique per reset() call (uuid4 hex, 12 chars).
+    batch_stats:
+      type: object
+      description: >
+        Aggregate stats: n_transactions, n_accounts, total_amount, date_range.
+
+scoring:
+  duplicate_detection:
+    metric: F1 score (precision + recall) + 0.05 report bonus
+    notes: False positives reduce precision. Report must mention "duplicate".
+  pattern_fraud:
+    metric: Weighted accuracy (correct ID+type=1.0, correct ID+wrong type=0.5, FP=-0.2) + report bonus
+    notes: Up to 4 patterns active per episode (each with 0.7 probability).
+  laundering_chain:
+    metric: Weighted components (chain_recall=0.45, fp_penalty=0.20, account_coverage=0.15, sar_quality=0.20)
+    notes: SAR report must name all 4 chain accounts and use "structuring" or "smurfing".
+
+runtime:
+  max_total_minutes: 20
+  vcpu: 2
+  memory_gb: 8
+  ports:
+    fastapi: 7860
+    gradio: 7861
