@@ -245,6 +245,8 @@ def run_episode(client: OpenAI, task_id: str) -> float:
 
     finally:
         success = score >= 0.5
+        score = max(0.001, min(0.999, float(score)))
+        rewards = [max(0.001, min(0.999, float(r))) for r in rewards]
         log_end(
             success=success,
             steps=steps_taken,

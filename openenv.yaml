@@ -16,7 +16,7 @@ tasks:
       Same account + same merchant + same amount (within $0.01) + within 24 hours.
     difficulty: easy
     max_steps: 3
-    score_range: [0.0, 1.0]
+    score_range: [0.001, 0.999]
 
   - id: pattern_fraud
     description: >
@@ -25,7 +25,7 @@ tasks:
       Not all patterns are active in every episode.
     difficulty: medium
     max_steps: 3
-    score_range: [0.0, 1.0]
+    score_range: [0.001, 0.999]
 
   - id: laundering_chain
     description: >
@@ -34,7 +34,7 @@ tasks:
       pattern. Minimum 150 words required in report_text.
     difficulty: hard
     max_steps: 3
-    score_range: [0.0, 1.0]
+    score_range: [0.001, 0.999]
 
 endpoints:
   reset:
