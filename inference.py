@@ -34,17 +34,17 @@ def log_start(task: str, env: str, model: str) -> None:
 
 def log_step(step: int, action: str, reward: float, done: bool, error) -> None:
     print(
-        f"[STEP]  step={step} action={action} reward={reward:.2f} "
+        f"[STEP]  step={step} action={action} reward={reward:.3f} "
         f"done={str(done).lower()} error={error if error else 'null'}",
         flush=True,
     )
 
 
 def log_end(success: bool, steps: int, score: float, rewards: List[float]) -> None:
-    r_str = ",".join(f"{r:.2f}" for r in rewards)
+    r_str = ",".join(f"{r:.3f}" for r in rewards)
     print(
         f"[END]   success={str(success).lower()} steps={steps} "
-        f"score={score:.2f} rewards={r_str}",
+        f"score={score:.3f} rewards={r_str}",
         flush=True,
     )
 

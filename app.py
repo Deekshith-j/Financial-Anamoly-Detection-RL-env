@@ -137,7 +137,7 @@ def run_episode_streaming(task_id, api_base, model, token, env_url):
             )
             log_line = (
                 f"[STEP]  step={step} action={summary} "
-                f"reward={reward:.2f} done={str(done).lower()} error=null"
+                f"reward={reward:.3f} done={str(done).lower()} error=null"
             )
             add_log(log_line)
 
@@ -159,8 +159,8 @@ def run_episode_streaming(task_id, api_base, model, token, env_url):
         success = score >= 0.5
         end_line = (
             f"[END]   success={str(success).lower()} "
-            f"steps={steps_taken} score={score:.2f} "
-            f"rewards={','.join(f'{r:.2f}' for r in rewards)}"
+            f"steps={steps_taken} score={score:.3f} "
+            f"rewards={','.join(f'{r:.3f}' for r in rewards)}"
         )
         add_log(end_line)
 
