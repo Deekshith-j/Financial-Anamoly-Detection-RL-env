@@ -52,8 +52,8 @@ class FinancialAnomalyEnv:
         self._ground_truth = {}
         self._step_count = 0
         self._done = False
-        self._best_score = 0.0
-        self._last_reward = 0.0
+        self._best_score = 0.001
+        self._last_reward = 0.001
         self._last_feedback = ""
 
     def reset(
@@ -73,8 +73,8 @@ class FinancialAnomalyEnv:
         self._episode_id = uuid.uuid4().hex[:12]
         self._step_count = 0
         self._done = False
-        self._best_score = 0.0
-        self._last_reward = 0.0
+        self._best_score = 0.001
+        self._last_reward = 0.001
         self._last_feedback = ""
 
         # Generate fresh transactions + ground truth
@@ -91,7 +91,7 @@ class FinancialAnomalyEnv:
         if self._done:
             return StepResult(
                 observation=self._build_obs(self._last_feedback),
-                reward=0.0,
+                reward=0.001,
                 done=True,
                 info={"error": "Episode finished. Call reset()."},
             )
@@ -132,7 +132,7 @@ class FinancialAnomalyEnv:
             shaped *= 0.90
             feedback += " | PENALTY: flagged fraud but chose 'approve'."
 
-        shaped = max(0.0, min(1.0, shaped))
+        shaped = max(0.001, min(0.999, shaped))
         self._best_score = max(self._best_score, score)
         self._last_reward = shaped
         self._last_feedback = feedback
