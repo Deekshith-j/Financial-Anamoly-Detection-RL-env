@@ -13,9 +13,6 @@ import os
 import json
 import textwrap
 from typing import List, Optional
-from dotenv import load_dotenv
-
-load_dotenv()
 
 import requests
 from openai import OpenAI
@@ -120,7 +117,7 @@ def call_llm(client: OpenAI, obs: dict, history: list) -> dict:
             "transaction_type":  t["transaction_type"],
             "channel":           t["channel"],
         }
-        for t in obs["transactions"][:20]
+        for t in obs["transactions"]
     ]
 
     # Account profiles — strip internal risk_score before sending to agent

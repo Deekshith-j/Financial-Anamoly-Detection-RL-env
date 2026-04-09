@@ -8,7 +8,7 @@ from typing import List, Dict, Tuple
 
 
 def _clamp(v: float) -> float:
-    return max(0.0, min(1.0, round(v, 4)))
+    return max(0.001, min(0.999, round(v, 4)))
 
 
 def grade_duplicate_detection(
